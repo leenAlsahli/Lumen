@@ -1,4 +1,3 @@
-# Baseera — Natural Scene Classification with CNN
 
 A Convolutional Neural Network built entirely from scratch to classify natural scene images into six categories — buildings, forest, glacier, mountain, sea, and street — achieving **90.10% test accuracy** on unseen data.
 
