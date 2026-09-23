@@ -60,7 +60,15 @@ Two tuning experiments were run to compare hyperparameter configurations:
 | sea | 0.92 | 0.93 | 0.92 |
 | street | 0.91 | 0.90 | 0.91 |
 
-Forest was classified most reliably (F1: 0.98), while glacier and mountain were the most commonly confused pair due to their visual similarity — a pattern also reflected in the confusion matrix.
+<p align="center">
+  <img src="assets/accuracy_loss_curves.png" alt="Accuracy and Loss Curves" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/confusion_matrix.png" alt="Confusion Matrix" width="500">
+</p>
+
+Forest was classified most reliably (F1: 0.98), while glacier and mountain were the most commonly confused pair due to their visual similarity — a pattern also reflected in the confusion matrix above.
 
 ## Challenges & Future Work
 - Glacier vs. mountain and street vs. buildings were the most visually ambiguous pairs to classify
