@@ -1,8 +1,9 @@
+# Lumen — Natural Scene Classification with CNN
 
 A Convolutional Neural Network built entirely from scratch to classify natural scene images into six categories — buildings, forest, glacier, mountain, sea, and street — achieving **90.10% test accuracy** on unseen data.
 
 ## Overview
-Baseera (Arabic for "insight" or "deep perception") explores how deep learning models can learn to truly "see" and understand visual scenes — not just classify pixels, but recognize the patterns, textures, and structures that define a place. Using the Intel Image Classification Dataset (~25,000 images), a CNN architecture was designed, trained, and tuned entirely from scratch, without relying on pre-trained networks.
+Lumen (Latin for "light") explores how deep learning models can learn to truly "see" and understand visual scenes — not just classify pixels, but recognize the patterns, textures, and structures that define a place. Using the Intel Image Classification Dataset (~25,000 images), a CNN architecture was designed, trained, and tuned entirely from scratch, without relying on pre-trained networks.
 
 ## Dataset
 - **Source:** [Intel Image Classification Dataset](https://www.kaggle.com/datasets/puneet6060/intel-image-classification) (Kaggle)
