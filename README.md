@@ -1,85 +1,104 @@
-# Lumen — Natural Scene Classification with CNN
+---
+title: Lumen
+emoji: 👁️
+sdk: docker
+app_port: 7860
+---
+# LUMEN — Natural Scene Classification
 
-A Convolutional Neural Network built entirely from scratch to classify natural scene images into six categories — buildings, forest, glacier, mountain, sea, and street — achieving **90.10% test accuracy** on unseen data.
+An AI-powered computer vision system that classifies natural scenes using deep learning.
+A CNN trained from scratch on the Intel Image Classification dataset (6 classes, **89.43 % test accuracy**), wrapped in a FastAPI backend and a hand-built HTML/CSS/JS interface.
 
-## Overview
-Lumen (Latin for "light") explores how deep learning models can learn to truly "see" and understand visual scenes — not just classify pixels, but recognize the patterns, textures, and structures that define a place. Using the Intel Image Classification Dataset (~25,000 images), a CNN architecture was designed, trained, and tuned entirely from scratch, without relying on pre-trained networks.
+**Features:** drag-and-drop / paste upload · real predictions with top-3 probabilities · Grad-CAM attention map · model architecture and training details · accuracy / loss curves · confusion matrix.
 
-## Dataset
-- **Source:** [Intel Image Classification Dataset](https://www.kaggle.com/datasets/puneet6060/intel-image-classification) (Kaggle)
-- **Size:** ~25,000 RGB images, 150×150 pixels
-- **Classes:** buildings, forest, glacier, mountain, sea, street
-- **Split:** 11,932 training / 2,102 validation / 3,000 test images
+## Project structure
 
-| Class | Train | Test |
-|---|---|---|
-| buildings | 1,863 | 437 |
-| forest | 1,931 | 474 |
-| glacier | 2,044 | 553 |
-| mountain | 2,136 | 525 |
-| sea | 1,933 | 510 |
-| street | 2,025 | 501 |
+```
+lumen/
+├── app.py                 # FastAPI backend: loads the model, /api/predict, serves the UI
+├── requirements.txt
+├── Dockerfile             # for Hugging Face Spaces / any container host
+├── model/                 # ← PUT YOUR MODEL FILE HERE (.keras or .h5)
+└── static/
+    ├── index.html  style.css  app.js
+    ├── img/               # logo files
+    └── data/metrics.json  # history, confusion matrix, scores (from your notebook)
+```
 
-## Model Architecture
-A custom CNN built from scratch with 4 convolutional blocks (no pre-trained models used):
+## 1. Model and evaluation files
 
-- **Input:** 128×128×3 RGB images
-- **Block 1–4:** Conv2D layers (32 → 256 filters) with Batch Normalization and Max Pooling
-- **Global Average Pooling** (instead of Flatten) to reduce parameters
-- **Dense layer** (256, ReLU) with Batch Normalization and Dropout
-- **Output:** Dense(6, Softmax) for the six scene classes
-- **Total parameters:** 653,350 (651,430 trainable)
+The trained model is already in `model/lumen_model.keras`. To replace it, save from Colab and overwrite the file:
 
-## Preprocessing
-- Images resized from 150×150 to 128×128
-- Pixel normalization ([0,255] → [0,1])
-- Data augmentation on training data only (rotation, shift, zoom, shear, flip, brightness)
-- One-hot label encoding, 15% validation split, batch loading (batch size 32)
+```python
+model.save("lumen_model.keras")   # `model` holds the best epoch weights after EarlyStopping
+```
 
-## Training & Experimentation
-Two tuning experiments were run to compare hyperparameter configurations:
+**Confusion matrix and per-class scores** are loaded from `static/data/evaluation.json`. Generate it in Colab (after the test generator cells) and put the file in `static/data/`:
 
-| Experiment | Learning Rate | Dropout | Max Epochs | Test Accuracy |
-|---|---|---|---|---|
-| **1 (Best)** | 1e-3 | 0.4 | 45 | **90.10%** |
-| 2 | 5e-4 | 0.5 | 30 | 88.53% |
+```python
+import json, numpy as np
+from sklearn.metrics import confusion_matrix, classification_report
+test_gen_final = test_datagen.flow_from_directory(TEST_DIR, target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE, class_mode="categorical", shuffle=False)
+y_pred = np.argmax(model.predict(test_gen_final, verbose=0), axis=1)
+y_true = test_gen_final.classes
+rep = classification_report(y_true, y_pred, target_names=class_names, output_dict=True)
+json.dump({"confusion_matrix": confusion_matrix(y_true, y_pred).tolist(),
+           "report": {c: {"precision": rep[c]["precision"], "recall": rep[c]["recall"],
+                          "f1": rep[c]["f1-score"], "support": int(rep[c]["support"])} for c in class_names},
+           "macro_f1": rep["macro avg"]["f1-score"]}, open("evaluation.json", "w"))
+from google.colab import files; files.download("evaluation.json")
+```
 
-- **Loss:** Categorical cross-entropy with label smoothing (0.1)
-- **Optimizer:** Adam
-- **Regularization:** Dropout, Batch Normalization, Data Augmentation, EarlyStopping, ReduceLROnPlateau
+Until this file exists, the confusion-matrix block is hidden.
 
-## Results
-**Final Test Accuracy: 90.10%** on 3,000 unseen images
+## 2. Run locally
 
-| Class | Precision | Recall | F1-score |
-|---|---|---|---|
-| buildings | 0.88 | 0.91 | 0.90 |
-| forest | 0.98 | 0.99 | 0.98 |
-| glacier | 0.85 | 0.86 | 0.85 |
-| mountain | 0.87 | 0.83 | 0.85 |
-| sea | 0.92 | 0.93 | 0.92 |
-| street | 0.91 | 0.90 | 0.91 |
+```bash
+python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8000
+```
 
-<p align="center">
-  <img src="assets/accuracy_loss_curves.png" alt="Accuracy and Loss Curves" width="700">
-</p>
+Open http://localhost:8000. `GET /api/health` tells you whether the model was loaded.
 
-<p align="center">
-  <img src="assets/confusion_matrix.png" alt="Confusion Matrix" width="500">
-</p>
+### Preview the interface without a model
 
-Forest was classified most reliably (F1: 0.98), while glacier and mountain were the most commonly confused pair due to their visual similarity — a pattern also reflected in the confusion matrix above.
+Only the web dependencies are needed (no TensorFlow):
 
-## Challenges & Future Work
-- Glacier vs. mountain and street vs. buildings were the most visually ambiguous pairs to classify
-- Slight class imbalance across categories may have marginally affected results
-- Future improvement: additional targeted data augmentation for the most confused classes, without relying on pre-trained models
+```bash
+pip install fastapi "uvicorn[standard]" python-multipart pillow numpy
+LUMEN_PREVIEW=1 uvicorn app:app --port 8000        # Windows PowerShell: $env:LUMEN_PREVIEW=1; uvicorn app:app --port 8000
+```
 
-## Tech Stack
-- **Language:** Python
-- **Framework:** TensorFlow / Keras
-- **Environment:** Google Colab (GPU-accelerated training)
-- **Tools:** NumPy, Matplotlib, scikit-learn (evaluation metrics)
+Uploads then return **simulated** results, clearly labelled "Preview mode". Never deploy with this variable set.
 
-## Author
-Leen Alsahli — [LinkedIn](https://linkedin.com/in/leen-alsahli-1064a6305) | [Portfolio](https://leen-portfolio-inky.vercel.app)
+## 3. Deploy online
+
+FastAPI serves your custom HTML, so use a container host (Streamlit Cloud only runs Streamlit apps).
+
+**Hugging Face Spaces (free, recommended)**
+1. Create a new Space → SDK **Docker** (blank).
+2. Add this header at the very top of `README.md` in the Space repo:
+   ```
+   ---
+   title: Lumen
+   sdk: docker
+   app_port: 7860
+   ---
+   ```
+3. Push the project including `model/lumen_model.keras` (~8 MB, no Git LFS needed):
+   ```bash
+   git remote add space https://huggingface.co/spaces/<user>/lumen
+   git push space main
+   ```
+The `Dockerfile` already listens on port 7860.
+
+**Render / Railway / Fly.io** — same repo, start command:
+`uvicorn app:app --host 0.0.0.0 --port $PORT`
+
+## Notes
+
+- **Preprocessing matches training:** RGB → shrink to ≤150 px (dataset native size) → 128×128 (nearest-neighbour, the Keras `flow_from_directory` default) → ÷255. Class order is alphabetical: buildings, forest, glacier, mountain, sea, street.
+- Update the figures on the page by editing `static/data/metrics.json`.
+- The "25K+ images" figure is the size of the full Intel dataset; your notebook trained on 11,932 images, validated on 2,102 and tested on 3,000 (shown in *About the Model*).

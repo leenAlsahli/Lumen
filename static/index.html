@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUMEN — Natural Scene Classification</title>
+<meta name="description" content="An AI-powered computer vision system that classifies natural scenes using deep learning.">
+<link rel="icon" href="/static/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="brand"><img src="/static/img/logo-icon.png" alt=""><span>LUMEN</span></a>
+    <nav>
+      <a href="#demo">Demo</a><a href="#model">Model</a><a href="#performance">Performance</a>
+      <a href="#demo" class="pill sm">Try it</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero wrap">
+  <div class="hero-text">
+    <p class="eyebrow reveal">Natural Scene Classification</p>
+    <h1 class="reveal">Teaching machines to <em>read the landscape.</em></h1>
+    <p class="lead reveal">An AI-powered computer vision system that classifies natural scenes using deep learning.</p>
+    <div class="cta reveal"><a href="#demo" class="pill">Try the model</a><a href="#model" class="ghost">How it works →</a></div>
+  </div>
+  <div class="hero-art reveal"><div class="glow"></div><img src="/static/img/logo-icon.png" alt="LUMEN eye emblem"></div>
+</section>
+
+<section class="wrap stats reveal" id="stats"></section>
+
+<section class="wrap sec" id="demo">
+  <div class="sec-head reveal"><p class="eyebrow">Live demo</p><h2>Show it a scene.</h2>
+    <p>Upload any landscape or city photo. The trained CNN answers in milliseconds.</p></div>
+
+  <div class="demo reveal">
+    <div class="left">
+      <label class="drop" id="drop" tabindex="0">
+        <input type="file" id="file" accept="image/*" hidden>
+        <div class="drop-empty" id="dropEmpty">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <strong>Drop an image here</strong>
+          <span>or click to browse · you can also paste (Ctrl/⌘+V)</span>
+          <em>JPG, PNG, WEBP · up to 10 MB</em>
+        </div>
+        <div class="preview" id="preview" hidden><img id="prevImg" alt="Uploaded image preview"><div class="scan"></div></div>
+      </label>
+      <div class="seg" id="seg" hidden>
+        <button data-v="orig" class="on">Original</button><button data-v="cam">Attention map</button>
+      </div>
+      <p class="hint" id="camHint" hidden>Warm areas show where the network looked to make its decision (Grad-CAM).</p>
+    </div>
+
+    <div class="right" id="panel">
+      <div class="empty" id="resEmpty">
+        <p class="eyebrow">Prediction</p>
+        <p class="muted">Your result will appear here.</p>
+        <div class="chips" id="chips"></div>
+      </div>
+      <div id="resBox" hidden>
+        <p class="eyebrow">Prediction</p>
+        <div class="res-head">
+          <div><span class="emoji" id="rEmoji"></span><h3 id="rLabel"></h3></div>
+          <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" class="trk"/><circle cx="50" cy="50" r="42" class="val" id="ringVal"/></svg><div><b id="rConf">0</b><small>confidence</small></div></div>
+        </div>
+        <p class="eyebrow sm">Top predictions</p>
+        <ul class="bars" id="bars"></ul>
+        <p class="meta" id="rMeta"></p>
+        <p class="note" id="rNote" hidden></p>
+      </div>
+      <div class="err" id="err" hidden></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap sec" id="model">
+  <div class="sec-head reveal"><p class="eyebrow">About the model</p><h2>A compact CNN, built from scratch.</h2>
+    <p>No pretrained weights. Seven convolutional layers, batch normalisation throughout, and only 653K parameters.</p></div>
+  <div class="arch reveal" id="arch"></div>
+  <div class="info reveal" id="info"></div>
+</section>
+
+<section class="wrap sec" id="performance">
+  <div class="sec-head reveal"><p class="eyebrow">Performance</p><h2>Measured on 3,000 unseen images.</h2>
+    <p>Training curves from the final model and its confusion matrix on the held-out test set.</p></div>
+  <div class="charts reveal"><figure id="accChart"></figure><figure id="lossChart"></figure></div>
+  <div class="cm-wrap reveal">
+    <div><h3>Confusion matrix</h3><p class="muted">Rows are true classes, columns are predictions. Darker means a larger share of that class.</p><div class="cm" id="cm"></div></div>
+    <div><h3>Per-class scores</h3><p class="muted">Precision, recall and F1 on the test set.</p><div class="rep" id="rep"></div></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <img src="/static/img/logo-full.png" alt="LUMEN — Natural Scene Classification">
+    <p>Trained on the Intel Image Classification dataset · TensorFlow / Keras · FastAPI<br>CS1465 Neural Networks &amp; Deep Learning · Leen Alsahli</p>
+  </div>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
