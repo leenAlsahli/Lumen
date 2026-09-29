@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-pandas
-openpyxl
-python-multipart
-torch
-transformers>=5.0
