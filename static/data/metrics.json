@@ -10,7 +10,7 @@
  "stats": {
   "images": 25000,
   "classes": 6,
-  "accuracy": 89.43
+  "accuracy": 90.10
  },
  "history": {
   "acc": [
