@@ -1,9 +1,4 @@
----
-title: Lumen
-emoji: 👁️
-sdk: docker
-app_port: 7860
----
+
 # LUMEN — Natural Scene Classification
 
 An AI-powered computer vision system that classifies natural scenes using deep learning.
